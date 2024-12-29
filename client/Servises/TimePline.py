@@ -1,4 +1,4 @@
-import datetime
+import datetime, enum
 
 class WorkTimeLineManager():
 
@@ -11,7 +11,7 @@ class WorkTimeLineManager():
 
         self.__time_line_list[self.active_worker].finish_job()
 
-        if not name in self.__time_line_list:
+        if not name in self.__time_line_list and name:
             self.__time_line_list[name] = WorkTimeLine(name)
 
         self.active_worker = name
@@ -26,7 +26,11 @@ class WorkTimeLineManager():
 
         self.break_status = False
 
-
+class EventType(enum.Enum):
+    start_job = 1
+    finish_job = 2
+    start_break = 3
+    finish_break = 4
 
 class WorkTimeLine():
 
@@ -36,30 +40,30 @@ class WorkTimeLine():
         self.start_time = datetime.datetime.now().time().strftime("%H:%M:%S")
 
         self.time_line.append({
-            "type": "start_job",
+            "type": EventType.start_job,
             "date": datetime.datetime.now().time().strftime("%H:%M:%S")
         })
     
     def start_job(self):
         self.time_line.append({
-            "type": "start_job",
+            "type": EventType.start_job,
             "date": datetime.datetime.now().time().strftime("%H:%M:%S")
         })
     
     def finish_job(self):
         self.time_line.append({
-            "type": "finish_job",
+            "type": EventType.finish_job,
             "date": datetime.datetime.now().time().strftime("%H:%M:%S")
         })
     
     def start_break(self):
         self.time_line.append({
-            "type": "start_break",
+            "type": EventType.start_break,
             "date": datetime.datetime.now().time().strftime("%H:%M:%S")
         })
 
     def finish_break(self):
         self.time_line.append({
-            "type": "finish_break",
+            "type": EventType.finish_break,
             "date": datetime.datetime.now().time().strftime("%H:%M:%S")
         })

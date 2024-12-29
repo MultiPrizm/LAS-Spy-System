@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,18 +31,20 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+JWT_KEY = os.getenv("jwt")
 
 # Application definition
 
 INSTALLED_APPS = [
+    'adminpanel',
+    'authorization',
+    'spy_app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'authorization',
-    'spy_app',
+    'django.contrib.staticfiles',   
 ]
 
 MIDDLEWARE = [
@@ -125,3 +131,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Вказуємо, що статичні файли у корені проєкту
+]

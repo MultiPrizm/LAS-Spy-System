@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+
+{% load static %}
+
+{% block content %}
+  {% if custom_menu %}
+    <ul>
+      {% for item in custom_menu %}
+        <li><a href="{{ item.url }}">{{ item.name }}</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No custom menu available.</p>
+  {% endif %}
+
+  {{ block.super }}  <!-- Відобразити стандартний контент -->
+  <script src="{% static 'admin/test.js' %}"></script>
+{% endblock %}

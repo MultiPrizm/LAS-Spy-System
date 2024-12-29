@@ -1,19 +1,26 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from authorization.forms import AddWorkstationForm
 from django.contrib import messages
+from server.settings import JWT_KEY
+import jwt
 
-def login(req):
-    data = {
-        "test": 1
-    }
+def auth_decorator(func):
+
+    @wrapper(func)
+    def wrapper(request, *arg, **kwargs):
+
+        auth_header = request.headers.get('Authorization')
+        
+        if not auth_header:
+            return JsonResponse({'error': 'Authorization token is missing'}, status=401)
+        
+        try:
+            decoded_token = jwt.decode(auth_header, JWT_KEY, algorithms=["HS256"])
+
+            request.user = decoded_token
+        except (IndexError, jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+            return JsonResponse({'error': 'Invalid or expired token'}, status=401)
+
+        return func(request, *arg, **kwargs)
     
-    return JsonResponse(data)
-
-def add_work_station_model(request, admin_site):
-    if request.method == "POST":
-        form = AddWorkstationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Запис успішно додано!")
-            return redirect("admin:index")
+    return wrapper

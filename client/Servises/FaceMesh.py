@@ -26,7 +26,6 @@ def compare_faces(face_vector1, face_vector2, method='euclidean'):
         return np.sum(np.abs(face_vector1 - face_vector2))
     
 def face_comparator(face1, face2):
-    print(face1)
 
     if face1.multi_face_landmarks is not None and face2.multi_face_landmarks is not None:
         face1_vec = get_face_vector(face1.multi_face_landmarks[0].landmark)
@@ -35,3 +34,13 @@ def face_comparator(face1, face2):
         similarity_score = compare_faces(face1_vec, face2_vec, method='cosine')
 
         print(similarity_score)
+
+        return similarity_score
+
+def save_face_vector_to_svg(face_vector):
+    
+    return ','.join(map(str, face_vector))
+
+def get_face_vector_from_svg(svg_face_vector):
+
+    return np.array([float(x) for x in svg_face_vector.split(',')])

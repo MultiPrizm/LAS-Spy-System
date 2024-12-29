@@ -21,4 +21,5 @@ import authorization.urls
 
 urlpatterns = [
     path("auth/", include('authorization.urls')),
+    path("admin/", include('adminpanel.urls')),
 ]
