@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_GET
 from django.http import JsonResponse
 from django.contrib import messages
 from server.settings import JWT_KEY
@@ -26,6 +27,7 @@ def auth_decorator(func):
     
     return wrapper
 
+@require_GET
 @auth_decorator
 def load_users(requests):
 

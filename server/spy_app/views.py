@@ -3,10 +3,11 @@ from authorization.views import auth_decorator
 from django.http import HttpResponse
 from spy_app.models import DailyWorkReport, Worker, BrowserHistoryItem
 from django.utils.timezone import localdate, localtime
+from django.views.decorators.http import require_POST
 import json
 from datetime import datetime
 
-
+@require_POST
 @auth_decorator
 def send_work_report(request):
     client_report = request.headers.get("Report")
@@ -133,6 +134,7 @@ def send_work_report(request):
     
     return HttpResponse(status = 200)
 
+@require_POST
 @auth_decorator
 def sent_browser_history(request):
     

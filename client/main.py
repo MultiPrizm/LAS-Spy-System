@@ -27,7 +27,7 @@ async def shut_up_system():
     if DEBUG:
         asyncio.Task(debug.LaunchServise())
 
-    #asyncio.Task(time_servise.LaunchServise())
+    asyncio.Task(time_servise.LaunchServise())
     asyncio.Task(bhm.LaunchServise())
     await work_observer.LaunchServise()
 
