@@ -2,14 +2,15 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib import messages
 from server.settings import JWT_KEY
+from authorization.models import WorkStation
+from spy_app.models import Worker
 import jwt
 
 def auth_decorator(func):
 
-    @wrapper(func)
     def wrapper(request, *arg, **kwargs):
 
-        auth_header = request.headers.get('Authorization')
+        auth_header = request.headers.get('Auth')
         
         if not auth_header:
             return JsonResponse({'error': 'Authorization token is missing'}, status=401)
@@ -24,3 +25,18 @@ def auth_decorator(func):
         return func(request, *arg, **kwargs)
     
     return wrapper
+
+@auth_decorator
+def load_users(requests):
+
+    station = WorkStation.objects.filter(id = requests.user["station"])[0]
+
+    worker_list = Worker.objects.filter(station = station)
+
+    data = []
+
+    for i in worker_list:
+        print(i.id)
+        data.append([i.id, i.face_hash.decode()]) 
+
+    return JsonResponse({"users": data})

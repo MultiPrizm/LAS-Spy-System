@@ -1,10 +1,12 @@
-import sys, Servises.ConfigManager, asyncio
-from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QTextEdit, QProgressBar, QGroupBox, QLabel, QLineEdit, QMessageBox
+import sys, Servises.ConfigManager, asyncio, sqlite3
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QTextEdit, QProgressBar, QGroupBox, QLabel, QLineEdit, QMessageBox, QComboBox
 
 class ConfigApp(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, db: Servises.ConfigManager.DBManager):
         super().__init__()
+
+        self.db = db
 
         self.setWindowTitle("Config Application")
         self.setGeometry(100, 100, 600, 400)
@@ -51,14 +53,14 @@ class ConfigApp(QMainWindow):
         self.main_layout.addWidget(self.setup_box_progres)
 
         # setup menu
-        self.setup_info = QLabel("qqq")
+        self.setup_info = QLabel("In this menu you can install database")
         self.setup_box_layout.addWidget(self.setup_info)
 
         self.setup_button = QPushButton("Setup DB")
         self.setup_box_layout.addWidget(self.setup_button)
         self.setup_button.clicked.connect(self.setup_db)
 
-        self.reset_button = QPushButton("Reset DB")
+        self.reset_button = QPushButton("Clear DB")
         self.setup_box_layout.addWidget(self.reset_button)
         self.reset_button.clicked.connect(self.setup_db)
 
@@ -77,20 +79,52 @@ class ConfigApp(QMainWindow):
         self.config_ip_input = QLineEdit()
         self.config_box_layout.addWidget(self.config_ip_input)
 
+        self.config_ip_input.setText(self.db.get_secure_string_data("server_ip"))
+
         self.config_token_info = QLabel("API token")
         self.config_box_layout.addWidget(self.config_token_info)
 
         self.config_token_input = QLineEdit()
         self.config_box_layout.addWidget(self.config_token_input)
 
+        self.config_token_input.setText(self.db.get_secure_string_data("api_token"))
+
+        self.config_protocot_info = QLabel("Protocol")
+        self.config_box_layout.addWidget(self.config_protocot_info)
+
+        self.config_protocot_list = QComboBox()
+        self.config_protocot_list.addItems(["http", "https"])
+        self.config_protocot_list.setCurrentText(self.db.get_secure_string_data("protocol"))
+        self.config_box_layout.addWidget(self.config_protocot_list)
+
         self.config_save_button = QPushButton("Save")
         self.config_box_layout.addWidget(self.config_save_button)
+        self.config_save_button.clicked.connect(self.set_api_config)
+    
+    def set_api_config(self):
+        try:
+            self.db.setup_secure_string_data("server_ip", self.config_ip_input.text())
+            self.db.setup_secure_string_data("api_token", self.config_token_input.text())
+            self.db.setup_secure_string_data("protocol", self.config_protocot_list.currentText())
+        except sqlite3.OperationalError:
+            self.show_error_window("Database don`t installed")
+            return
 
-    def show_info_window(self):
+        self.show_info_window()
+
+    def show_info_window(self, mess: str = "Finish"):
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
         msg.setWindowTitle("Info")
-        msg.setText("Finish")
+        msg.setText(mess)
+
+        msg.exec_()
+    
+    def show_error_window(self, mess: str = "Error"):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setWindowTitle("Error")
+        msg.setText(mess)
 
         msg.exec_()
     
@@ -127,8 +161,9 @@ class ConfigApp(QMainWindow):
 if __name__ == "__main__":
 
     app = QApplication(sys.argv)
+    db = Servises.ConfigManager.DBManager()
 
-    window = ConfigApp()
+    window = ConfigApp(db)
     window.show()
 
     sys.exit(app.exec_())
