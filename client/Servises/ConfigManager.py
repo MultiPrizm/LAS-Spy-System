@@ -26,9 +26,12 @@ class DBManager():
         self.cursor.execute("SELECT data FROM secure_string_data WHERE id = ?", (key,))
         data = self.cursor.fetchall()
 
-        data = win32crypt.CryptUnprotectData(data[0][0])
+        try:
+            data = win32crypt.CryptUnprotectData(data[0][0])
 
-        return data[1].decode()
+            return data[1].decode()
+        except IndexError:
+            return None
     
     def addUser(self, id: str, face_hash: str = "None"):
 

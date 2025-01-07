@@ -12,14 +12,9 @@ class RequestsManager():
         self.token = self.db.get_secure_string_data("api_token")
         self.protocol = self.db.get_secure_string_data("protocol")
 
-        session = requests.Session()
-
         self.url = f"{self.protocol}://{self.ip}/"
 
-        session.get(self.url + "admin/")
-
         self.headers = {
-            'X-CSRFToken': session.cookies.get('csrftoken'),
             "Auth": self.token
         }
 
